@@ -1,0 +1,306 @@
+﻿/~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\
+|*)      DMO Pack Manager - 1.3 by Dragonlord      (*|
+|*)                  roland@rptd.ch                (*|
+\~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~/
+~~~~~~~~~ __/v \/v v\___/v VVv V\_____/Vv\__ ~~~~~~~~~
+ ~~~~  __/v           V           VvV       V\__  ~~~~ 
+ \  \_/Vv     ____     _       _     ____      V\_/  /
+  |@|          )  \_    \ _|_ /    _/  (          |@|
+  \  \        )_____\_ `>¬.=.¬<´ _/_____(        /  /
+  |**|         )_   / \_/\o=o/\_/ \   _(         |**|
+ / /\ \          )_/__/ \ VvV / \__\_(          / /\ \
+_VV__VV____________VVVv___~*~___vVVV____________VV__VV_
+                      ~@œ¢#8#¢œ@~
+                       ~~~*#*~~~
+                          ~~~
+
+Table of Contents //
+///////////////////
+
+0. Legal Disclaimer
+1. Introduction
+2. Requirements
+3. Installation
+4. Usage
+4.1 First Run
+4.2 Updating
+4.3 Exporting
+4.4 Importing
+5. Technical Background
+5.1 *.dmop File Format
+6. Credits
+
+
+
+0. Legal Disclaimer //
+/////////////////////
+
+This application allows to work with package files as used by the
+Digimon Master Online MMO game. This is the one and only intended
+purpose. The author can not be held responsible for misusing or
+incorrectly using the application for any other purpose. The use
+of this application happens on your own risk. The author can not
+be held responsible for any potential damage caused due to the 
+usage of this software.
+
+This application is distribute under the terms of the GNU General
+Public License v2 or later (at your option).
+
+
+
+1. Introduction //
+/////////////////
+
+DMO uses a sort of archive files to store gama data. One major
+problem with these archive files is that they are no true archives.
+A true archive is self-sustaining hence it stores also a TOC
+(table of contents) with proper filenames. DMO archive files on
+the other hand only store an ID instead of a filename. This way
+an external mapping from IDs to filenames is required as otherwise
+working with archive files is futile. Furthermore archive files
+are split into two files: a file map and a data file. File maps
+have the ending *.hf and contain the TOC. Data files have the ending
+*.pf and contain the data stored in the TOC.
+
+A warning to begin with. This application can easily destroy the
+archive files rendering the game unusable. Read carefully the
+instructions and make backups.
+
+This application has three main purposes. The first is to build a
+mapping between IDs and filenames. As mentioned above the TOC in
+the archive files only uses IDs not filenames. Using this application
+the TOC can be extended with the filenames. Once done so the application
+allows to easily export files from the archive as well as importing
+files into the archive. Only replacing existing files is supported.
+
+
+
+2. Requirements //
+/////////////////
+
+This application has no other requirements than a DMO installation as
+well as the DLL files included in the bin directory. The application
+detects the installed DMO version. If the Korean version is detected
+(K) is included in the window title. If the English version is detected
+(G) is included in the window title. (?) is included in the window
+title if no valid installation has been found. In this case verify your
+game is correctly installed and that you point the application to the
+directory where either DigimonMasters.exe or GDMO.exe is located.
+
+
+
+3. Installation //
+/////////////////
+
+Extract the contents of the bin directory into any directory you want
+and run dmopackman.exe .
+
+
+
+4. Usage //
+//////////
+
+This application allows three main operations on archive files. Most important
+is the updating process. After that exporting as well as importing can be done.
+Importing is a dangerous process so only use it if you know what you are doing.
+
+
+
+4.1 First Run //
+///////////////
+
+The first time the application is started the path to the DMO
+installation has to be specified. Simply select the directory where
+the DigimonMasters.exe executable is located. You can change this
+directory later on using the menu point "File"->"Set DMO Path". The
+application only works properly if this path is set correctly.
+
+Once set you can load and save packages like in an ordinary application
+using the "File" menu.
+
+
+
+4.2 Updating //
+//////////////
+
+Updating is the process of creating mappings between IDs in the TOC and filenames.
+Without this mapping exporting and importing is still usable but not so simple.
+In general you load an existing package file and update from there. You can though
+also start from scratch which though is going to consume a lot of time. If you do
+not want to do a clean start skip the next paragraph.
+
+To do a clean start begin with an empty package file (File -> New). Set first the
+package parameters using "Package" -> "Package Properties". Set the path to the
+filemap (*.hf) and data file (*.pf) for the package. These path are relative to
+the DMO Path (hence the directory where DigimonMasters.exe or GDMO.exe is located).
+Select the matching game type. Updates only work if the package game type matches
+the game type of the installed game. The content path prefix is used for updating
+and defines the directory inside patch zip files located on the Digitalic Update
+Server. You have to figure out this one on your own usually by looking at a patch
+zip file. Obtaining those is beyond the scope of this documentation. A typical value
+is "Pack01/Data/". The last part is the package version. This is the version up to
+which the file mappings have been updated already. The initial version is 1.
+You usually do not touch this as the application manages them. You can though change
+this if you know what you are doing. Once done you can close the dialog. Your package
+file is now ready for importing the archive files. Do so using "Package" -> "Import Archive".
+This will read the TOC of the archive you want to work with. This process is done
+automatically by various update, export and import processes and adds new entries not
+in the package file yet as well as updating offsets and sizes of all entries. Once
+done you are aready to start updating. Saving this file away in a safe location is a
+good idea. Now you can continue to update.
+
+Whenever the launcher of the game receives an update you have to also update the
+package files. Important is that you have to always update the package file after
+you have "successfully" updated your DMO game (hence you got to the login screen).
+This application uses a reverse mapping technique to link filenames to IDs. To do
+this the application fetches the same patch zip files as DMO does but instead of
+installing the patches it extracts the files contained and maps them against the
+content of archive files on your disk (hence why it is required to have an updated
+DMO first). For this purpose for all entries in an archive file an SHA1 hash is
+calculated. Then one patch zip file after the other is downloaded from the Digitalic
+server and processed. All files are examined if they are part of the package. Files
+are considered part of the package if their filename inside the zip archive matches
+the "Content Path Prefix" as defined in the package properties dialog. Once a file
+is found to belong to the package an SHA1 hash is calculated too and the matching
+file in the package looked for (aka the entry with the same SHA1 hash). If a match
+is found the matching entry is extended using the filename of the file in the patch.
+This way the TOC is gradually populated with filenames. You will find in the logs
+missing entries. This happens if a file is patched by multiple patches in the same
+update. The first patch zip file containing the file in question is not going to
+match since the content in the archive file on your disk contains already the
+later patch. Just ignore those messages as they are not much of use. For those
+interested in reverse engineering they can look at the log file produced by the
+application as these messages are written there too.
+
+As a side note. You can also patch directly from files located on your hard disk instead
+of using the patch zip files from Digitalic. To do so select "Package" -> "Map Directory"
+and select the directory where the files are located. The process is the same as described
+above just that the files are taken from the directory instead from the zip file. In
+contrary to the update version above though the "Content Path Prefix" is disregarded hence
+the files have to be locted in the directory to map as they appear in the package. See
+4.5 Importing (zip part) for more details as the same applies here as it does there.
+
+Once the update is done your package file contains a lot (but far from all) of mapped
+entries. You can now use the export and import features of the application or just
+browse the content of the package. The content of the archive is listed in two different
+panels. The first panel contains a flat list of all entries. This is an overview of the
+TOC. The second panel contains a browsable listing of the content. This is sort-of
+file manager showing the content of the package. Entries with known filenames are listed
+in a tree fashion so you can check out the content in a more convenient way. The second
+tree contains a flat view of all unknown entries hence entries without a filename
+attached to them. Using these views you can then export or import files.
+
+People interested in reverse engineering can alter the TOC listing. For this select
+an entry in the TOC view and right-click on it. Select "Edit" to edit the TOC entry.
+Be careful while doing so as these changes can corrupt the archive files. The main
+use for this dialog is to set the filename of the entry on your own. You should not
+touch the offset or size unless you have a very good reason.
+
+
+
+4.3 Exporting //
+///////////////
+
+The most prominent use of the application is to export files. You can export files from
+both panels and from either the directory listing as well as the file listing. Select
+the files or directory you want to export and then right-click on one of them. In the
+context menu select "Export". If you select files from the file listing they are exported
+to a directory of your choice without path names just the files. If you select a directory
+to export the directory and all elements inside (sub-directories including files) are
+exported to a directory of your choice. Path names relative to the selected directory are
+retained. As a last possibility you can select files from the entries panel instead. In
+this case all selected files are exported to a directory of your choice with the entire
+filename retained. In all cases missing directories are created automatically where
+needed. It is very well possible exported files do not work (for example image files).
+The reason for this is not known yet but most probably has to do with how the DMO launcher
+creates archive files and most probably are deprecated files or even corrupted files.
+Thus be not surprised if exported files are broken, it's natural.
+
+
+
+4.4 Importing //
+///////////////
+
+A special feature of this application is importing. You can import any file into the
+archive as long as it matches an entry in the TOC. For this you select a file to
+replace with an imported file and right-click on it. Select from the context menu "Import"
+to choose a file from disk. You can do this from all views. Once selected the entry shows
+a "(*)" next to the filename or ID (depending which view you are using). This means that
+for this file an import file has been selected but not modified yet. You can thus set an
+import file for various files before carrying modifying the archive files. If you made
+a mistake you can clear an import using the same context menu selecting "Clear Import".
+Once you are done you can start the actual importing using "Package" -> "Import Files".
+Be warned though that once you start this process you can not stop until it is finished.
+If you import wrong files you can seriously damage your DMO installation. The files are
+updated in-place hence you have to make a backup first on your own. Once done the TOC
+of the package file has changed. You have to save the package file afterwards to keep
+your TOC up to date. If you forget this, no problem. Just use "Package" -> "Import Archive"
+to update your TOC with the actual package files on disk.
+
+In addition to this manual importing there exists a nifty batch importing mode in this
+application. For this purpose you have to download or create a zip file containing all
+files to import. The files in the zip file have to match the filename of the entry to
+modify. Hence if for example an entry in thre package file has the filename "Digimon\Bla.nif"
+then your replacement file in the zip file has to be named "Bla.nif" located in a directory
+"Digimon" and so forth. Best way is to export the files in question from the TOC view
+(as this produces the correct directory structure) one by one, modifying the files and
+then zipping them all up. You can then use this zip file to do a quick patching. To do
+so select "Package" -> "Import Files From ZIP" and select your zip file. This updates
+the archives files immediately disregarding manual imports you set previously. The same
+warnings apply as before.
+
+
+
+
+5. Technical Background //
+/////////////////////////
+
+Some informations of technical aspect. This is only interesting for people
+planing to work with *.dmop files outside the translator application.
+
+
+
+5.1 *.dmop File Format //
+////////////////////////
+
+The file format is a straight forward binary file format. The following
+pseudo-code illustrates the file format.
+
+char => 1-byte unsigned character
+short => 2-byte signed short integer
+int => 4-byte signed integer
+uint => 4-byte unsigned integer
+string => UTF-8 encoded, null terminated string. stored:
+    short byteCount // number of required bytes without 0-terminator
+    char[byteCount] utf8EncodedString
+    char nullTerminator // == 0
+[] => array of elements each packed directly after each other
+
+*.dmop (version 1.0):
+
+char[16] fileSignature // == "DMOPackage======"
+short versionMajor // == 1
+short versionMinor // == 0
+
+string pathPF                // path to the data file relative to the DMO directory
+string pathHF                // path to the file map relative to the DMO directory
+string contentPathPrefix     // prefix to identify package files in update zip files
+int updateVersion            // version this package is updated to
+
+int entryCount
+entries[entryCount]:
+	uint id         // unique identifier of the entry
+	uint offset     // offset in bytes inside the data file
+	uint size       // size of the entry data in bytes
+	string path     // filename of the entry or an empty string if unknown
+
+
+
+6. Credits //
+////////////
+
+For this application various free software packages have been used:
+- GUI ToolKit: FOX-ToolKit ( http://www.fox-toolkit.org )
+- HTTP downloading: cURL ( http://curl.haxx.se )
+- ZIP reading: minizip ( http://www.winimage.com/zLibDll/minizip.html )
+- SHA1 calculation: sha1 ( http://www.packetizer.com/security/sha1 )
